@@ -1,38 +1,39 @@
-.App {
-  text-align: center;
+/* .list-transition {
+  top: 50px;
+  transition: all 400ms;
+  max-height: 200px;
+  width: 200px;
+  background-color: blueviolet;
+}
+.example-enter {
+  opacity: 1;
+  transform:translateX(-100%);
+} */
+/* .example-enter-active {
+  opacity: 1;
+  transform:translateX(0);
+  transition: opacity 300ms, transform 300ms;
+} */
+/* .example-exit {
+  opacity: 1;
+  transform:translateX(0);
+}
+.example-exit-active {
+  opacity: 2;
+  transform:translateX(-100%);
+  transition: opacity 300ms, transform 300ms;
+} */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.container::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
 }

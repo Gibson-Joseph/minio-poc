@@ -30,8 +30,8 @@ function getBucketObjectList(state = INTIAL_STATE, action) {
     }
 
     case GET_BUCKET_OBJ_LIST: {
-      console.log("myPayload--------------", myPayload);
-      console.log("state.data--------------", state.data);
+      // console.log("myPayload--------------", myPayload);
+      // console.log("state.data--------------", state.data);
       return {
         ...state,
         data: myPayload,

@@ -37,20 +37,41 @@ function App() {
 
   const uploadObj = () => {
     console.log("fileData", fileData);
-    // const fileBuffer = new FileReader();
-    // fileBuffer.readAsDataURL(fileData);
-    // fileBuffer.onload = function () {
-    //   console.log(fileBuffer.result);
-    // };
-    // fileBuffer.onerror = function (error) {
-    //   console.log("Error: ", error);
-    // };
+    const fileBuffer = new FileReader();
+    fileBuffer.readAsDataURL(fileData);
+    fileBuffer.onload = function () {
+      console.log(fileBuffer.result);
+
+      let buf = Buffer.from(fileBuffer.result, "base64");
+      console.log("buf ----- ----- -----", buf);
+
+      mc.putObject(getCurrentBucket, fileData.name, buf, function (err, etag) {
+        let minioBuckets = [];
+
+        let stream = mc.listObjects(getCurrentBucket, "", true);
+        stream.on("data", function (obj) {
+          minioBuckets.push(obj);
+          if (minioBuckets) {
+            console.log("minioBuckets array", minioBuckets);
+            dispatch(getBucketObjList(minioBuckets));
+            setPopup(false);
+          } else {
+            console.log("else block called");
+            dispatch(getBucketObjList("No Data"));
+          }
+        });
+        return console.log(err, etag); // err should be null
+      });
+    };
+    fileBuffer.onerror = function (error) {
+      console.log("Error: ", error);
+    };
     ///////////////
-    let reader = new FileReader();
-    reader.readAsDataURL(fileData);
-    console.log("reader", reader);
-    const url = window.webkitURL.createObjectURL(fileData);
-    console.log("url", url);
+    // let reader = new FileReader();
+    // reader.readAsDataURL(fileData);
+    // console.log("reader", reader);
+    // const url = window.webkitURL.createObjectURL(fileData);
+    // console.log("url", url);
     //////////////
     // setPopup(false);
     // mc.putObject(
@@ -120,8 +141,9 @@ function App() {
               </button>
             ) : (
               <button
-                className="border border-gray-500 px-4 py-1 bg-slate-700 text-white hover:bg-red-600 hover:text-white float-right rounded"
+                className={`border border-gray-500 px-4 py-1 bg-slate-700 text-white hover:bg-red-600 hover:text-white float-right rounded`}
                 onClick={() => uploadObj()}
+                disabled={fileData === undefined}
               >
                 Upload
               </button>

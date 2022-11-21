@@ -43,7 +43,7 @@ const MenuItem = ({ createBkt }) => {
 
       if (minioBuckets.length !== 0) {
         dispatch(getBucketObjList(minioBuckets));
-        console.log("state------", state);
+        // console.log("state------", state);
         console.log();
       }
     });

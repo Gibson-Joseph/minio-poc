@@ -16,10 +16,20 @@ const Model = ({ warn, setWarn, setPopup, whatIDelete }) => {
     return state.bucketObj.infoMetaData;
   });
 
+  const state = useSelector((state) => {
+    return state.bucketObj.data;
+  });
+
   const dispatch = useDispatch();
   let stream;
 
   const removeObj = (objName) => {
+    if (state.length === 1) {
+      console.log("calling state.length", state.length);
+      dispatch(getBucketObjList([]));
+      setPopup(false);
+      setWarn(false);
+    }
     if (whatIDelete === "deleteObject") {
       mc.removeObject(getCurrentBucket, objName, function (err) {
         if (err) {
@@ -30,12 +40,15 @@ const Model = ({ warn, setWarn, setPopup, whatIDelete }) => {
         stream.on("data", function (obj) {
           minioBuckets.push(obj);
           console.log("minioBuckets [] --->", minioBuckets);
-          if (minioBuckets) {
+          if (minioBuckets.length > 0) {
+            console.log("call first if block", minioBuckets.length);
             dispatch(getBucketObjList(minioBuckets));
             setPopup(false);
             setWarn(false);
           } else {
-            dispatch(getBucketObjList("No Data"));
+            console.log("call second if block", minioBuckets.length);
+            dispatch(getBucketObjList([""]));
+            setWarn(false);
           }
         });
         stream.on("error", function (err) {

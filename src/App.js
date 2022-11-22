@@ -17,6 +17,7 @@ function App() {
   const [fileData, setFileData] = useState();
   const [bucketName, setBucketName] = useState();
   console.log("popup", popup);
+
   const cancelBucket = () => {
     setPopup(false);
   };
@@ -25,6 +26,7 @@ function App() {
     return state.bucketObj.currentBucket;
   });
 
+  //Create Folder
   const createBkt = () => {
     mc.makeBucket(bucketName, "us-east-1", function (err) {
       if (err) return console.log("Error creating bucket.", err);
@@ -33,76 +35,35 @@ function App() {
       dispatch(currentBucket(bucketName));
     });
   };
-  // let FS = require("fs");
 
+  //Upload File
   const uploadObj = () => {
     console.log("fileData", fileData);
     const fileBuffer = new FileReader();
-    fileBuffer.readAsDataURL(fileData);
+    // fileBuffer.readAsDataURL(fileData);
+    fileBuffer.readAsArrayBuffer(fileData);
     fileBuffer.onload = function () {
       console.log(fileBuffer.result);
 
       let buf = Buffer.from(fileBuffer.result, "base64");
-      console.log("buf ----- ----- -----", buf);
+      // console.log("buf ----- ----- -----", buf);
 
       mc.putObject(getCurrentBucket, fileData.name, buf, function (err, etag) {
-        let minioBuckets = [];
-
-        let stream = mc.listObjects(getCurrentBucket, "", true);
-        stream.on("data", function (obj) {
-          minioBuckets.push(obj);
-          if (minioBuckets) {
-            console.log("minioBuckets array", minioBuckets);
-            dispatch(getBucketObjList(minioBuckets));
-            setPopup(false);
-          } else {
-            console.log("else block called");
-            dispatch(getBucketObjList("No Data"));
-          }
-        });
+        setPopup(false);
         return console.log(err, etag); // err should be null
       });
     };
     fileBuffer.onerror = function (error) {
       console.log("Error: ", error);
     };
-    ///////////////
-    // let reader = new FileReader();
-    // reader.readAsDataURL(fileData);
-    // console.log("reader", reader);
-    // const url = window.webkitURL.createObjectURL(fileData);
-    // console.log("url", url);
-    //////////////
-    // setPopup(false);
-    // mc.putObject(
-    //   getCurrentBucket,
-    //   fileData.name,
-    //   fileBuffer.result,
-    //   function (err, etag) {
-    //     let minioBuckets = [];
-    //     let stream = mc.listObjects(getCurrentBucket, "", true);
-    //     stream.on("data", function (obj) {
-    //       minioBuckets.push(obj);
-    //       if (minioBuckets) {
-    //         console.log("minioBuckets array", minioBuckets);
-    //         dispatch(getBucketObjList(minioBuckets));
-    //         setPopup(false);
-    //       } else {
-    //         console.log("else block called");
-    //         dispatch(getBucketObjList("No Data"));
-    //       }
-    //     });
-    //     return console.log(err, etag); // err should be null
-    //   }
-    // );
   };
 
   return (
-    <div className=" h-screen">
-      <div className="w-full">
+    <div className="">
+      <div className="">
         <HeaderComponent setPopup={setPopup} setInputType={setInputType} />
-        <div className="w-full">
-          <MenuItem createBkt={createBkt} />
+        <div className="">
+          <MenuItem createBkt={createBkt} uploadObj={uploadObj} />
         </div>
       </div>
       {popup && (

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import "../App.css";
 
 const HeaderComponent = ({ setPopup, setInputType }) => {
+  const [order, setOrder] = useState(false);
   const createBucket = () => {
     setInputType("text");
     setPopup(true);
@@ -10,6 +11,13 @@ const HeaderComponent = ({ setPopup, setInputType }) => {
     setInputType("file");
     setPopup(true);
   };
+
+  // const handleOrder=()=>{
+  //   setOrder(!order)
+  //   if(order){
+
+  //   }
+  // }
 
   return (
     <header className="h-full p-2 border w-full border-gray-400 lg:py-5 sm:px-3 sm:m-2">

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import mc from "../mc";
 import pdfImg from "../assets/image1.png";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { metaData } from "../redux/actions/getBucketObjList.action";
 
 import { Transition } from "react-transition-group";
@@ -9,31 +9,40 @@ import { Transition } from "react-transition-group";
 import "../App.css";
 import Model from "./Model";
 
-const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
+const MainComponent = ({
+  popup,
+  setPopup,
+  setMenuBar,
+  menuBar,
+  list,
+  getBuckets,
+  setList,
+  listObjectsOfBucket,
+  buckets,
+}) => {
   const [warn, setWarn] = useState(false);
   const [whatIDelete, setWhatIdelete] = useState(null);
   const [dropDown, setDropDown] = useState(false);
+  const [meteData, setMetaData] = useState();
   let imgUrl = [];
-  let metaImage = [];
-  const state = useSelector((state) => {
-    return state.bucketObj.data;
-  });
+  const [metaImage, setMetaImage] = useState();
 
-  const dispatch = useDispatch();
+  // const state = useSelector((state) => {
+  //   return state.bucketObj.data;
+  // });
 
   const getCurrentBucket = useSelector((state) => {
     return state.bucketObj.currentBucket;
   });
 
-  const getInfoData = useSelector((state) => {
-    return state.bucketObj.infoMetaData;
-  });
+  // const getInfoData = useSelector((state) => {
+  //   return state.bucketObj.infoMetaData;
+  // });
 
   const viewMetaData = (i) => {
-    dispatch(metaData([state[i]]));
+    setMetaData(list[i]);
     setPopup(true);
-    metaImage.push(imgUrl[i]);
-    console.log("metaImage", metaImage[0]);
+    setMetaImage(imgUrl[i]);
   };
 
   const download = (objName) => {
@@ -120,6 +129,9 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
                 <p className="text-red-600 text-sm sm:text-base truncate">
                   {getCurrentBucket}
                 </p>
+                {/* <p className="text-red-600 text-sm sm:text-base truncate">
+                  / {meteData?.name}
+                </p> */}
               </span>
             </span>
           </div>
@@ -130,6 +142,7 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
             >
               more
             </button>
+
             {/* drop down */}
             <div
               className={`${
@@ -152,17 +165,9 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
           </div>
         </header>
         <main className="w-full">
-          <div
-            className={`${
-              state.length === 0
-                ? "w-full h-full"
-                : `grid grid-cols-4 mt-3 ${
-                    popup ? "lg:sm:grid-cols-3" : "lg:grid-cols-6"
-                  } gap-1`
-            }`}
-          >
-            {state.length !== 0 &&
-              state?.map((val, i) => {
+          <div className="flex flex-wrap">
+            {list.length !== 0 &&
+              list?.map((val, i) => {
                 mc.presignedUrl(
                   "GET",
                   getCurrentBucket,
@@ -176,13 +181,10 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
                 return (
                   <div
                     key={i}
-                    className="w-[100px] px-3 py-1 flex justify-center items-center cursor-pointer hover:bg-slate-200 h-full"
+                    className="w-[100px] px-3 py-1 flex justify-center items-center cursor-pointer hover:bg-slate-200 h-full sm:m-5"
                     onClick={() => viewMetaData(i)}
                   >
                     <div className="">
-                      {console.log(
-                        val.name.slice(val.name.indexOf("."), val.name.length)
-                      )}
                       <img
                         className="hover:bg-slate-200 h-10 w-14 sm:h-24 sm:w-40 rounded border border-red-300 text-xs sm:text-base"
                         src={
@@ -209,7 +211,7 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
                   </div>
                 );
               })}
-            {state.length === 0 && (
+            {list.length === 0 && (
               <div className="w-full h-full flex justify-center items-center">
                 <span>
                   No Files in
@@ -223,8 +225,8 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
           </div>
         </main>
       </div>
-      {/* <SwitchTransition mode='in-out'> */}
-      <Transition timeout={400}>
+      {/* <Transition timeout={400}> */}
+      
         <div
           className={`${
             popup
@@ -243,26 +245,35 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
           </header>
           <main>
             <div className="flex justify-center my-2">
-              {console.log("metaImage --- ---- ---- --- ", metaImage[0])}
-              <img src={metaImage[0]} alt="image" height={80} width={80} />
+              <img
+                src={metaImage}
+                alt="image"
+                className="border border-red-400 h-32"
+              />
             </div>
             <div className="flex flex-col ">
               <span className="py-1 px-3 m-1">
                 <span className="text-lg font-normal"> Type :</span>
-                <span className="font-serif"> file </span>
+                <span className="font-serif">
+                  {
+                    meteData?.name.split(".")[
+                      meteData?.name.split(".").length - 1
+                    ]
+                  }
+                </span>
               </span>
               <span className="py-1 px-3 m-1">
                 <span className="text-lg font-normal"> Name : </span>
-                <span className="font-serif">{getInfoData[0]?.name}</span>
+                <span className="font-serif">{meteData?.name}</span>
               </span>
               <span className="py-1 px-3 m-1">
                 <span className="text-lg font-normal"> Size : </span>
-                <span className="font-serif"> {getInfoData[0]?.size}</span>
+                <span className="font-serif"> {meteData?.size}</span>
               </span>
               <span className="py-1 px-3 m-1">
                 <span className="text-lg font-normal"> Last Modified : </span>
                 <span className="font-serif">
-                  {getInfoData[0]?.lastModified.toString()}
+                  {meteData?.lastModified.toString()}
                 </span>
               </span>
             </div>
@@ -273,7 +284,7 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
               <div className="flex">
                 <button
                   className="w-[90%] border border-red-500 hover:bg-orange-600 py-1 hover:text-white rounded-lg  font-medium"
-                  onClick={() => download(getInfoData[0].name)}
+                  onClick={() => download(meteData.name)}
                 >
                   Download
                 </button>
@@ -287,7 +298,7 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
             </div>
           </main>
         </div>
-      </Transition>
+      {/* </Transition> */}
 
       {/* model*/}
       <Model
@@ -295,6 +306,12 @@ const MainComponent = ({ popup, setPopup, setMenuBar, menuBar }) => {
         setWarn={setWarn}
         setPopup={setPopup}
         whatIDelete={whatIDelete}
+        list={list}
+        getBuckets={getBuckets}
+        setList={setList}
+        meteData={meteData}
+        listObjectsOfBucket={listObjectsOfBucket}
+        buckets={buckets}
       />
     </div>
   );

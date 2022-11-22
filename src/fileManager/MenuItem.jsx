@@ -10,31 +10,35 @@ import {
 import { Transition } from "react-transition-group";
 import "../App.css";
 
-const MenuItem = ({ createBkt }) => {
+const MenuItem = ({ createBkt,uploadObj }) => {
   const [buckets, setBuckets] = useState([]);
   const [rotatSvg, setRotateSvg] = useState("");
   const [popup, setPopup] = useState(false);
-  console.log("popup in MenuItem componenet (popup) ------", popup);
+  // console.log("popup in MenuItem componenet (popup) ------", popup);
   const [menuBar, setMenuBar] = useState(true);
-
+  const [list, setList] = useState([]);
+  console.log("buckets", buckets);
   const dispatch = useDispatch();
-  const getBuckets = async () => {
-    const res = await mc.listBuckets();
-    dispatch(bucket(res));
-  };
-
   const getCurrentBucket = useSelector((state) => {
     return state.bucketObj.currentBucket;
   });
-  const state = useSelector((state) => {
-    return state;
-  });
+  const getBuckets = async () => {
+    const res = await mc.listBuckets();
+    setBuckets(res);
+    // console.log("inside get function buckets", buckets);
+    // dispatch(currentBucket(buckets[0].name));
+    // listObjectsOfBucket(getCurrentBucket);
+  };
+
+  // const state = useSelector((state) => {
+  //   return state;
+  // });
 
   const listObjectsOfBucket = async (bucketName) => {
     setPopup(false);
     dispatch(currentBucket(bucketName));
-    setBuckets(bucketName);
-    dispatch(getBucketObjList([]));
+    // setBuckets(bucketName);
+    setList([]);
     let minioBuckets = [];
     setRotateSvg(bucketName);
     let stream = mc.listObjects(bucketName, "", true);
@@ -42,9 +46,9 @@ const MenuItem = ({ createBkt }) => {
       minioBuckets.push(obj);
 
       if (minioBuckets.length !== 0) {
-        dispatch(getBucketObjList(minioBuckets));
+        setList(minioBuckets);
         // console.log("state------", state);
-        console.log();
+        // console.log();
       }
     });
     stream.on("error", function (err) {
@@ -60,15 +64,21 @@ const MenuItem = ({ createBkt }) => {
 
   useEffect(() => {
     getBuckets();
+    setList([]);
+    // listObjectsOfBucket(getCurrentBucket);
   }, [createBkt]);
 
+  useEffect(() => {
+    listObjectsOfBucket(getCurrentBucket);
+  }, [uploadObj]);
+
   return (
-    <div className="w-full flex">
-      <Transition in={menuBar} timeout={400}>
+    <div className="w-full flex ">
+      {/* <Transition in={menuBar} timeout={400}> */}
         <div
           className={`${
             menuBar ? "w-72 shadow-lg absolute sm:relative" : "w-0"
-          } bg-slate-200 flex flex-col transition-all overflow-hidden`}
+          } bg-slate-200 flex flex-col transition-all`}
         >
           <div
             className={`flex justify-between px-3 py-3 border border-b-slate-300 border-b-2 ${
@@ -93,7 +103,7 @@ const MenuItem = ({ createBkt }) => {
             </button>
           </div>
           <div className="w-full overflow-y-scroll container">
-            {state?.bucketObj?.bucketName?.map((bucket, index) => {
+            {buckets?.map((bucket, index) => {
               return (
                 <span className="" key={index}>
                   <button
@@ -101,7 +111,7 @@ const MenuItem = ({ createBkt }) => {
                     onClick={() => listObjectsOfBucket(bucket.name)}
                     className={`${
                       getCurrentBucket === bucket.name
-                        ? "bg-red-600 hover:bg-red-500 text-white"
+                        ? "bg-red-600 hover:bg-red-500 text-white border border-yellow-500"
                         : "bg-slate-200 hover:bg-slate-100"
                     } w-full buttonst-none py-2 px-3 flex `}
                   >
@@ -135,13 +145,18 @@ const MenuItem = ({ createBkt }) => {
             </span>
           </div>
         </div>
-      </Transition>
-      <div className="w-full h-full">
+      {/* </Transition> */}
+      <div className="w-full">
         <MainComponent
           menuBar={menuBar}
           setMenuBar={setMenuBar}
           popup={popup}
           setPopup={setPopup}
+          buckets={buckets}
+          list={list}
+          setList={setList}
+          getBuckets={getBuckets}
+          listObjectsOfBucket={listObjectsOfBucket}
         />
       </div>
     </div>

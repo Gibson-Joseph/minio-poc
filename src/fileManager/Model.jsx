@@ -1,63 +1,93 @@
-import React from "react";
+import React, { useEffect } from "react";
 import mc from "../mc";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBucketObjList,
   deleteBucket,
+  currentBucket,
 } from "../redux/actions/getBucketObjList.action";
 import toastMsg from "../service/toastMsg/toast";
 
-const Model = ({ warn, setWarn, setPopup, whatIDelete }) => {
+const Model = ({
+  warn,
+  setWarn,
+  setPopup,
+  whatIDelete,
+  list,
+  getBuckets,
+  setList,
+  meteData,
+  listObjectsOfBucket,
+  buckets,
+}) => {
+  console.log("------ ------- ------ -------,buckets", buckets);
   const getCurrentBucket = useSelector((state) => {
     return state.bucketObj.currentBucket;
   });
 
-  const getInfoData = useSelector((state) => {
-    return state.bucketObj.infoMetaData;
-  });
+  // const getInfoData = useSelector((state) => {
+  //   return state.bucketObj.infoMetaData;
+  // });
 
-  const state = useSelector((state) => {
-    return state.bucketObj.data;
-  });
+  // const state = useSelector((state) => {
+  //   return state.bucketObj.data;
+  // });
 
   const dispatch = useDispatch();
   let stream;
 
   const removeObj = (objName) => {
-    if (state.length === 1) {
-      console.log("calling state.length", state.length);
-      dispatch(getBucketObjList([]));
-      setPopup(false);
-      setWarn(false);
-    }
+    // if (state.length === 1) {
+    //   console.log("calling state.length", state.length);
+    //   // dispatch(getBucketObjList([]));
+    //   setPopup(false);
+    //   setWarn(false);
+    // }
     if (whatIDelete === "deleteObject") {
-      mc.removeObject(getCurrentBucket, objName, function (err) {
+      mc.removeObject(getCurrentBucket, meteData.name, function (err) {
         if (err) {
           return console.log("Unable to remove object", err);
         }
-        let minioBuckets = [];
-        stream = mc.listObjects(getCurrentBucket, "", true);
-        stream.on("data", function (obj) {
-          minioBuckets.push(obj);
-          console.log("minioBuckets [] --->", minioBuckets);
-          if (minioBuckets.length > 0) {
-            console.log("call first if block", minioBuckets.length);
-            dispatch(getBucketObjList(minioBuckets));
-            setPopup(false);
-            setWarn(false);
-          } else {
-            console.log("call second if block", minioBuckets.length);
-            dispatch(getBucketObjList([""]));
-            setWarn(false);
-          }
-        });
-        stream.on("error", function (err) {
-          console.log(err);
-        });
+        // let minioBuckets = [];
+        // stream = mc.listObjects(getCurrentBucket, "", true);
+        // stream.on("data", function (obj) {
+        //   minioBuckets.push(obj);
+        //   console.log("minioBuckets [] --->", minioBuckets);
+        //   if (minioBuckets.length > 0) {
+        //     console.log("call first if block", minioBuckets.length);
+        //     dispatch(getBucketObjList(minioBuckets));
+        //     setPopup(false);
+        //     setWarn(false);
+        //   } else {
+        //     console.log("call second if block", minioBuckets.length);
+        //     dispatch(getBucketObjList([""]));
+        //     setWarn(false);
+        //   }
+        // });
+        listObjectsOfBucket(getCurrentBucket);
+        setPopup(false);
+        setWarn(false);
       });
       toastMsg("success");
     } else {
-      dispatch(deleteBucket(getCurrentBucket));
+      mc.removeObjects(getCurrentBucket, list, function (e) {
+        if (e) {
+          return console.log("Unable to remove Objects ", e);
+        }
+        console.log("Removed the objects successfully");
+        mc.removeBucket(getCurrentBucket, function (err) {
+          if (err) return console.log("unable to remove bucket.");
+          console.log("Bucket removed successfully.");
+
+          // if (buckets.length === buckets.length - 1) {
+          console.log("buckets[0].name", buckets[0].name);
+          dispatch(currentBucket(buckets[0].name));
+          getBuckets();
+          // listObjectsOfBucket(getCurrentBucket);
+          // }
+        });
+      });
+
       setWarn(false);
       toastMsg("success");
     }
@@ -66,6 +96,10 @@ const Model = ({ warn, setWarn, setPopup, whatIDelete }) => {
   const warnPopup = () => {
     setWarn(!warn);
   };
+
+  // useEffect(() => {
+  //   getBuckets();
+  // }, [removeObj]);
   return (
     <div
       id="popup-modal"
@@ -118,7 +152,7 @@ const Model = ({ warn, setWarn, setPopup, whatIDelete }) => {
               {whatIDelete === "deleteObject" ? "file" : "folder"} ?
             </h3>
             <button
-              onClick={() => removeObj(getInfoData[0].name)}
+              onClick={() => removeObj(meteData?.name)}
               data-modal-toggle="popup-modal"
               type="button"
               className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"

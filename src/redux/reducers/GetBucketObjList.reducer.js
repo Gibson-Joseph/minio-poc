@@ -10,33 +10,33 @@ import {
 import mc from "../../mc";
 
 const INTIAL_STATE = {
-  data: [],
-  bucketName: [],
+  // data: [],
+  // bucketName: [],
   currentBucket: "",
-  trash: [],
-  infoMetaData: [],
+  // trash: [],
+  // infoMetaData: [],
 };
 
 function getBucketObjectList(state = INTIAL_STATE, action) {
   let myPayload = action.payload;
 
   switch (action.type) {
-    case BUCKET: {
-      return {
-        ...state,
-        trash: state.data.filter((item, index) => item !== myPayload),
-        bucketName: myPayload,
-      };
-    }
+    // case BUCKET: {
+    //   return {
+    //     ...state,
+    //     trash: state.data.filter((item, index) => item !== myPayload),
+    //     bucketName: myPayload,
+    //   };
+    // }
 
-    case GET_BUCKET_OBJ_LIST: {
-      // console.log("myPayload--------------", myPayload);
-      // console.log("state.data--------------", state.data);
-      return {
-        ...state,
-        data: myPayload,
-      };
-    }
+    // case GET_BUCKET_OBJ_LIST: {
+    //   // console.log("myPayload--------------", myPayload);
+    //   // console.log("state.data--------------", state.data);
+    //   return {
+    //     ...state,
+    //     data: myPayload,
+    //   };
+    // }
 
     case CURRENT_BUCKET: {
       return {
@@ -44,12 +44,12 @@ function getBucketObjectList(state = INTIAL_STATE, action) {
         currentBucket: action.payload,
       };
     }
-    case META_DATA: {
-      return {
-        ...state,
-        infoMetaData: myPayload,
-      };
-    }
+    // case META_DATA: {
+    //   return {
+    //     ...state,
+    //     infoMetaData: myPayload,
+    //   };
+    // }
     // case DELETE_OBJ: {
     //     let stream;
     //     console.log("state.currentBucket", state.currentBucket);
@@ -86,45 +86,45 @@ function getBucketObjectList(state = INTIAL_STATE, action) {
 
     //     })
     // }
-    case TRASH_DATA: {
-      return {
-        ...state,
-        trash: state.data.filter((item, index) => item.name === myPayload.name),
-      };
-    }
+    // case TRASH_DATA: {
+    //   return {
+    //     ...state,
+    //     trash: state.data.filter((item, index) => item.name === myPayload.name),
+    //   };
+    // }
 
-    case DELETE_BUCKET: {
-      if (state.data) {
-        mc.removeObjects(myPayload, state.data, function (e) {
-          if (e) {
-            return console.log("Unable to remove Objects ", e);
-          }
-          console.log("Removed the objects successfully");
-          mc.removeBucket(myPayload, function (err) {
-            if (err) return console.log("unable to remove bucket.");
-            console.log("Bucket removed successfully.");
-          });
-        });
-        return {
-          ...state,
-          bucketName: state.bucketName.filter(
-            (item, index) => item.name !== myPayload
-          ),
-          data: [],
-        };
-      } else {
-        mc.removeBucket(myPayload, function (err) {
-          if (err) return console.log("unable to remove bucket.");
-          console.log("Bucket removed successfully.");
-        });
-        return {
-          ...state,
-          bucketName: state.bucketName.filter(
-            (item, index) => item.name !== myPayload
-          ),
-        };
-      }
-    }
+    // case DELETE_BUCKET: {
+    //   if (state.data) {
+    //     mc.removeObjects(myPayload, state.data, function (e) {
+    //       if (e) {
+    //         return console.log("Unable to remove Objects ", e);
+    //       }
+    //       console.log("Removed the objects successfully");
+    //       mc.removeBucket(myPayload, function (err) {
+    //         if (err) return console.log("unable to remove bucket.");
+    //         console.log("Bucket removed successfully.");
+    //       });
+    //     });
+    //     return {
+    //       ...state,
+    //       bucketName: state.bucketName.filter(
+    //         (item, index) => item.name !== myPayload
+    //       ),
+    //       data: [],
+    //     };
+    //   } else {
+    //     mc.removeBucket(myPayload, function (err) {
+    //       if (err) return console.log("unable to remove bucket.");
+    //       console.log("Bucket removed successfully.");
+    //     });
+    //     return {
+    //       ...state,
+    //       bucketName: state.bucketName.filter(
+    //         (item, index) => item.name !== myPayload
+    //       ),
+    //     };
+    //   }
+    // }
     default:
       return state;
   }
